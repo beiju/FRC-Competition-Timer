@@ -20,6 +20,36 @@ window.onresize = function(e) { // I know I should use addEventListener(), but i
 	}
 }
 
+/********** Get and update values of inputs **********/
+var interval = parseFloat(match_interval.value, 10)*60,
+	color_change_time = parseFloat(change_color.value, 10),
+	matches = matchnums.value.match(/\d+/g),
+	knownNum = parseInt(known_num.value, 10), // Without the 10, it assumes numbers prepended with 0 are octal
+	knownTime = {
+		hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
+		minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
+	}
+	
+match_interval.addEventListener('change', function(event) {
+	interval = parseFloat(match_interval.value, 10)*60;
+}, false);
+change_color.addEventListener('change', function(event) {
+	color_change_time = parseFloat(change_color.value, 10);
+}, false)
+matchnums.addEventListener('change', function(event) {
+	matches = matchnums.value.match(/\d+/g);
+}, false)
+known_num.addEventListener('change', function(event) {
+	knownNum = parseInt(known_num.value, 10);
+}, false)
+known_time.addEventListener('change', function(event) {
+	knownTime = {
+		hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
+		minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
+	}
+}, false)
+
+
 /********** Code for "Now" button **********/
 now.addEventListener('click', function(event) { 
 	var now = new Date(), 
@@ -55,6 +85,8 @@ judge_today.addEventListener('change', judgeTime, false);
 /********** Hash change listener **********/
 function switchTimers(event) {
 	var target = document.location.hash.replace('#','');
+	
+	if (target == "") target = "auto";
 	
 	timer_main.className = target;
 	
@@ -162,52 +194,16 @@ function displayTime(time, id) {
 	}
 }
 
-/********** Get and update values of inputs **********/
-var interval = parseFloat(match_interval.value, 10)*60
-	color_change_time = parseFloat(change_color.value, 10),
-	matches = matchnums.value.match(/\d+/g),
-	knownNum = parseInt(known_num.value, 10), // Without the 10, it assumes numbers prepended with 0 are octal
-	knownTime = {
-		hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
-		minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
-	}
-	
-match_interval.addEventListener('change', function(event) {
-	interval = parseFloat(match_interval.value, 10)*60;
-}, false);
-change_color.addEventListener('change', function(event) {
-	color_change_time = parseFloat(change_color.value, 10);
-}, false)
-matchnums.addEventListener('change', function(event) {
-	matches = matchnums.value.match(/\d+/g);
-}, false)
-known_num.addEventListener('change', function(event) {
-	knownNum = parseInt(known_num.value, 10);
-}, false)
-known_time.addEventListener('change', function(event) {
-	knownTime = {
-		hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
-		minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
-	}
-}, false)
 
 /********** Handle updating time **********/
 function updateTime() {
 	var now = new Date();
-	
-	test = interval; 
-	
-	if (matches == null && !queue_countdown.className.match('configure')) {
-		queue_countdown.innerHTML = 'Configure';
-		queue_countdown.className += ' configure';
+		
+	if (matches == null) {
+		timer_main.getElementsByClassName('timer')[0].innerHTML = 'Configure';
 		document.body.style.backgroundColor = '';
 		return;
-	} else if (matches == null) {
-		return;
-	} /*!else if (queue_countdown.className.match('configure')) {
-		queue_countdown.className.replace(' configure', '');
-		window.oldColor = '';
-	}*/
+	}
 	
 	var offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (knownTime.hours*60*60+knownTime.minutes*60),
 		currentlyQueueing = knownNum + offset / interval,
@@ -220,26 +216,16 @@ function updateTime() {
 	}
 	if (ourNextNum == 0) ourNextNum = match;
 	
-	our_next.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
-	now_queueing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyQueueing);
-	now_playing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyPlaying);
-	
 	var queueingNum = ourNextNum - currentlyQueueing,
 		playingNum = ourNextNum - currentlyPlaying,
 		queueingTime = new Time(queueingNum*interval/60), // input is in minutes
 		playingTime = new Time(playingNum*interval/60); // input is in minutes
 	
-	if (!isNaN(queueingTime.minutes)) {
-		displayTime(queueingTime, 'queueing');
-		
-		/*if (queueingTime.days > 0) queue_countdown.className = 'replace days';
-		else if (queueingTime.hours > 0) queue_countdown.className = 'replace hours';
-		else queue_countdown.className = 'replace';*/
-		
-	}
-	if (!isNaN(playingTime.minutes)) {
-		displayTime(playingTime, 'playing');
-	}
+	our_next.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
+	now_queueing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyQueueing);
+	now_playing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyPlaying);
+	if (!isNaN(queueingTime.minutes)) displayTime(queueingTime, 'queueing');
+	if (!isNaN(playingTime.minutes))  displayTime(playingTime, 'playing');
    	
 	
 	var colorMultiplier = parseFloat(timer_main.getElementsByClassName('timer')[0].getAttribute('data-time'))/color_change_time;
@@ -251,18 +237,17 @@ function updateTime() {
 	
 	if (typeof oldColor != "string" || oldColor != color) {
 		document.body.style.backgroundColor = color;
-		console.warn('changed color');
 		window.oldColor = color;
 	}
 	
-	if (debug) {
+	if (debug && false) {
 		console.log("Now:", now);
 		console.log("Last Known time:", knownTime.hours, ':', knownTime.minutes);
 		console.log("Offset between now and last known time:", offset);
 		console.log("Currently queueing match:", currentlyQueueing, "Currently playing match:", currentlyPlaying);
 		console.log("Next match we play:", ourNextNum);
-		console.log("Number of matches between us and the currently queueing match:", queueingNum);
-		console.log("Number of matches between us and the currently playing match:", playingNum);
+		console.log("Number of m atches between us and the currently queueing match:", queueingNum);
+		console.log("Number of ma tches between us and the currently playing match:", playingNum);
 		console.log("Time between us and the currently queueing match:", queueingTime.formatted);
 		console.log("Color multiplier (0 <= x <= 1):", colorMultiplier);
 		console.log("Time considered '100%%':", color_change_time/60, 'minutes');
@@ -270,4 +255,6 @@ function updateTime() {
 	}
 }
 updateTime();
-//		setInterval(updateTime, 1000);
+setInterval(function() {
+	updateTime();
+}, 1000);

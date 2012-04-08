@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    
+    <title>FRC Queueing Countdown</title>
+    
+    <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+    <div id="config">
+        <label>Time between matches:<input type="number" min="1" id="match_interval" value="6" /> minutes</label><br /><br /> 
+        <label for="matchnums">Match Numbers:</label>
+        <input type="text" id="matchnums" value=", 7"/>
+        
+        <p id="arrow">&#9660;</p>
+    </div>
+    
+    <div id="known">
+        <label>Last known match: <input type="number" id="known_num" value="3" min="1" /></label>
+        <label>Last known match time: <input type="time" id="known_time" value="08:00" /></label>
+    </div>
+    
+    <div id="queue">
+        <h1 id="queue_match">Next Queueing: match <span class="replace">0</span> in</h1>
+        <p id="queue_countdown" class="replace">00:00</p>
+    </div>
+    
+    <div id="play">
+        <h1 id="play_match">Next Playing: match <span class="replace">0</span> in</h1>
+        <p id="play_countdown" class="replace">00:00</p>
+    </div>
+
+    <script>
+        function updateTime() {
+            var now = new Date(), 
+                interval = parseFloat(match_interval.value, 10)*60,
+                matches = matchnums.value.match(/\d+/g),
+                knownNum = parseInt(known_num.value, 10), // Leave the 10 there, otherwise it assumes numbers prepended with 0 are octal
+                knownTime = {
+                    hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
+                    minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
+                }
+                    
+                
+            /* Debug * / now.setHours(8); // */
+            
+            if (matches == null) {
+                queue_countdown.innerHTML = 'config';
+                return;
+            }
+            
+            var offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (knownTime.hours*60*60+knownTime.minutes*60),
+                currentlyQueueing = knownNum + offset / interval,
+                currentlyPlaying = currentlyQueueing - 3,
+                ourNextNum = 0;
+            
+            for (var len = matches.length, i = 0; i < len && ourNextNum == 0; i++) {
+                var match = parseInt(matches[i], 10);
+                if (match > currentlyPlaying) ourNextNum = match;
+            }
+            if (ourNextNum == 0) ourNextNum = match;
+            
+            queue_match.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
+            play_match.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
+            
+            var queueingNum = ourNextNum - currentlyQueueing,
+                playingNum = ourNextNum - currentlyPlaying;
+                queueingTime = {
+                    time: queueingNum*interval/60, // in minutes
+                    minutes: Math.floor(queueingNum*interval/60),
+                    seconds: Math.abs(Math.round(queueingNum*interval % 60))
+                },
+                playingTime = {
+                    time: playingNum*interval/60, // in minutes
+                    minutes: Math.floor(playingNum*interval/60),
+                    seconds: Math.abs(Math.round(playingNum*interval % 60))
+                };
+                            
+            queue_countdown.innerHTML = queueingTime.minutes+':'+ (queueingTime.seconds<10?'0':'') +queueingTime.seconds;
+            play_countdown.innerHTML = playingTime.minutes+':'+ (playingTime.seconds<10?'0':'') +playingTime.seconds;
+            
+            // OK-ness
+            
+            var colorMultiplier = queueingTime.time/36;
+            if (colorMultiplier > 1) colorMultiplier = 1;
+            else if (colorMultiplier < 0) colorMultiplier = 0;
+            
+            var color = 'rgb('+Math.min(Math.round(255*(1-colorMultiplier)), 255)+','+Math.min(Math.round(255*colorMultiplier),255)+','+100+')';
+//            var color = 'hsl('+Math.round(130*(1-colorMultiplier))+','+150+','+150+')';
+            
+            document.body.style.background = color;
+            console.warn('changed color');
+            
+            console.log("Now:", now);
+            console.log("Last Known time:", knownTime.hours, ':', knownTime.minutes);
+            console.log("Offset between now and last known time:", offset);
+            console.log("Currently queueing match:", currentlyQueueing, "Currently playing match:", currentlyPlaying);
+            console.log("Next match we play:", ourNextNum);
+            console.log("Number of matches between us and the currently queueing match:", queueingNum);
+            console.log("Number of matches between us and the currently playing match:", playingNum);
+            console.log("Time between us and the currently queueing match:", queueingTime.minutes,':',queueingTime.seconds);
+            console.log('color: "'+color+'"');
+        }
+        
+        setInterval(updateTime, 1000)
+    </script>
+</body>

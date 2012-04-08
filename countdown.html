@@ -9,195 +9,72 @@
 </head>
 <body>
 	<div id="config">
+		<div id="known">
+			<label>Last known match: <input type="number" id="known_num" value="3" min="1" /></label>
+			<label>Last known match time: <input type="time" id="known_time" value="08:00" /></label>
+			<button id="now">Now</button>
+		</div>
 		<p>
 			<label for="matchnums">Match Numbers:</label>
 			<input type="text" id="matchnums" value=""/>
 		</p>
 		<div class="columns">
 			<p><label>Time between matches:<input type="number" min="1" id="match_interval" value="6" /> minutes</label></p>
-			<p><label>Time to start turning red: <input type="number" id="change_color" value="20" /> minutes</label></p>
+			<p><label>Time to start turning red: <input type="number" id="change_color" value="30" /> minutes</label></p>
 		</div>
 
-		<!--<div class="columns">
-			<p><label>Opening Ceremonies Time: <input type="time" name="opening_ceremonies_time" value="9:00" /></label></p>
+		<div class="columns">
+			<p><label>Opening Ceremonies Time: <input type="time" id="opening_ceremonies_time" value="9:00" /></label></p>
 			
-			<p><label>Closing Ceremonies Time: <input type="time" name="closing_ceremonies_time" value="16:30" /></label></p>
+			<p><label>Closing Ceremonies Time: <input type="time" id="closing_ceremonies_time" value="16:30" /></label></p>
 			
-			<p><label>Lunchtime: <input type="time" name="lunch_start" value="12:00" /></label> <label>to <input type="time" name="lunch_end" value="13:00" /></label></p>
+			<p><label>Lunchtime: <input type="time" id="lunch_start" value="12:00" /></label> <label>to <input type="time" id="lunch_end" value="13:00" /></label></p>
 			
-			<p><label>Judging time: <input type="time" name="judge_time" value="" /></label> <label>Today? <input type="checkbox" name="judge_today" value="false" /></label></p>
-		</div>-->
+			<p><label>Judging time: <input type="time" id="judge_time" value="" /></label> <label>Today? <input type="checkbox" id="judge_today" value="false" /></label></p>
+		</div>
 		
 		<p id="arrow">&#9660;</p>
 	</div>
 	
-	<div id="known">
-		<label>Last known match: <input type="number" id="known_num" value="3" min="1" /></label>
-		<label>Last known match time: <input type="time" id="known_time" value="08:00" /></label>
-		<button id="now">Now</button>
+	<div id="timers">
+		<div id="timer_list">
+			<div id="auto"><a href="#auto">
+				<h1 class="name">Lowest<br />Timer</h1>
+			</a></div>
+			<div id="queueing"><a href="#queueing">
+				<h1 class="name">Queueing</h1>
+				<p class="timer">00:00</p>
+			</a></div>
+			<div id="playing"><a href="#playing">
+				<h1 class="name">Playing</h1>
+				<p class="timer">00:00</p>
+			</a></div>
+			<div id="judging"><a href="#judging">
+				<h1 class="name">Judging</h1>
+				<p class="timer">00:00</p>
+			</a></div>
+			
+		</div>
+	
+		<div id="timer_main" class="queueing">
+			<p class="timer">00:00</p>
+		</div>
+		
+		<div id="timer_extras">
+			<div id="our_next">
+				<h1>Our next match:</h1>
+				<p class="replace">0</p>
+			</div>
+			<div id="now_queueing">
+				<h1>Currently Queueing:</h1>
+				<p class="replace">0</p>
+			</div>
+			<div id="now_playing">
+				<h1>Currently playing:</h1>
+				<p class="replace">0</p>
+			</div>
+		</div>
 	</div>
 	
-	<div id="queue">
-		<h1 id="queue_match">Match <span class="replace">0</span> will queue in</h1>
-		<p id="queue_countdown" class="replace">00:00</p>
-	</div>
-	
-	<div id="play">
-		<h1 id="play_match">Match <span class="replace">0</span> will play in</h1>
-		<p id="play_countdown" class="replace">00:00</p>
-	</div>
-
-	<script>var debug = true;
-		
-		
-		/********** Insert debug values **********/
-		if (debug) {
-			matchnums.value = '5, 13, 22, 36, 41, 49, 55, 67, 78';
-			known_time.value = '01:13';
-		}
-		
-		/********** Handle adaptive sizing **********/
-		function resize() {
-			document.body.style.fontSize = (window.innerWidth * 16 / 1440)+'px';
-		}
-		resize();
-		window.onresize = function(e) { // I know I should use addEventListener(), but it wasn't working
-			if (typeof resizing != "boolean" || !resizing) {
-				window.resizing = true;
-				resize();
-				console.warn("Resizing window");
-				window.resizing = false;
-			}
-		}
-		
-		/********** Code for "Now" button **********/
-		now.addEventListener('click', function(event) { 
-			var now = new Date(), 
-				hour = now.getHours(),
-				minute = now.getMinutes();
-				
-			known_time.value = (hour<10?'0':'')+hour + ':' + (minute<10?'0':'')+minute;
-			
-		}, false)
-		
-		
-		
-		/********** Class for handling times **********/
-		var Time = function(minutes) {
-			var o = {
-				time: minutes,
-				days: 0,
-				hours: 0,
-				minutes: Math.abs( minutes > 0 ? Math.floor(minutes) : Math.ceil(minutes) ),
-				seconds: Math.abs( Math.round(minutes*60 % 60) ),
-				negative: minutes < 0 ? true : false,
-			}
-			// Handle hours and days
-			if (o.minutes >= 60) {
-				o.hours = Math.floor(o.minutes/60);
-				o.minutes -= o.hours * 60;
-			} 
-			if (o.hours >= 24) {
-				o.days = Math.floor(o.hours/24);
-				o.hours -= o.days * 24;
-			} 
-			// Handle 60 seconds
-			if (o.seconds == 60) {
-				o.seconds = 0;
-				o.minutes = 1;
-			}
-			o.formatted = (o.negative?'-':'');
-			if (o.days != 0) o.formatted += o.days+':';
-			if (o.hours != 0) o.formatted += (o.days>0&&o.hours<10?'0':'')+o.hours+':';
-			o.formatted += (o.hours>0&&o.minutes<10?'0':'')+o.minutes+':';
-			o.formatted += (o.seconds<10?'0':'')+o.seconds;
-			return o;
-		}
-		
-		/********** Handle updating time **********/
-		function updateTime() {
-			var now = new Date(), 
-				interval = parseFloat(match_interval.value, 10)*60,
-				color_change_time = parseFloat(change_color.value, 10),
-				matches = matchnums.value.match(/\d+/g),
-				knownNum = parseInt(known_num.value, 10), // Without the 10, it assumes numbers prepended with 0 are octal
-				knownTime = {
-					hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
-					minutes: parseInt(known_time.value.match(/\d+$/)[0], 10)
-				}
-			
-			if (matches == null && !queue_countdown.className.match('configure')) {
-				queue_countdown.innerHTML = 'Configure';
-				queue_countdown.className += ' configure';
-				document.body.style.backgroundColor = '';
-				return;
-			} else if (matches == null) {
-				return;
-			} else if (queue_countdown.className.match('configure')) {
-				queue_countdown.className.replace(' configure', '');
-				window.oldColor = '';
-			}
-			
-			var offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (knownTime.hours*60*60+knownTime.minutes*60),
-				currentlyQueueing = knownNum + offset / interval,
-				currentlyPlaying = currentlyQueueing - 3,
-				ourNextNum = 0;
-			
-			for (var len = matches.length, i = 0; i < len && ourNextNum == 0; i++) {
-				var match = parseInt(matches[i], 10);
-				if (match > currentlyPlaying) ourNextNum = match;
-			}
-			if (ourNextNum == 0) ourNextNum = match;
-			
-			queue_match.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
-			play_match.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
-			
-			var queueingNum = ourNextNum - currentlyQueueing,
-				playingNum = ourNextNum - currentlyPlaying;
-				queueingTime = new Time(queueingNum*interval/60) // input is in minutes
-				playingTime = new Time(playingNum*interval/60) // input is in minutes
-			
-			if (!isNaN(queueingTime.minutes)) {
-				queue_countdown.innerHTML = queueingTime.formatted;
-				
-				if (queueingTime.days > 0) queue_countdown.className = 'replace days';
-				else if (queueingTime.hours > 0) queue_countdown.className = 'replace hours';
-				else queue_countdown.className = 'replace';
-				
-			}
-			if (!isNaN(playingTime.minutes)) {
-				play_countdown.innerHTML = playingTime.formatted;
-			}
-		   	
-			
-			var colorMultiplier = queueingTime.time/color_change_time;
-			if (colorMultiplier > 1) colorMultiplier = 1;
-			else if (colorMultiplier < 0) colorMultiplier = 0;
-			
-			//var color = 'rgb('+Math.min(Math.round(255*(1-colorMultiplier)), 255)+','+Math.min(Math.round(255*colorMultiplier),255)+','+0+')';
-			var color = 'hsl('+Math.round(130*colorMultiplier)+',100%,50%)';
-			
-			if (typeof oldColor != "string" || oldColor != color) {
-				document.body.style.backgroundColor = color;
-				console.warn('changed color');
-				window.oldColor = color;
-			}
-			
-			if (debug) {
-				console.log("Now:", now);
-				console.log("Last Known time:", knownTime.hours, ':', knownTime.minutes);
-				console.log("Offset between now and last known time:", offset);
-				console.log("Currently queueing match:", currentlyQueueing, "Currently playing match:", currentlyPlaying);
-				console.log("Next match we play:", ourNextNum);
-				console.log("Number of matches between us and the currently queueing match:", queueingNum);
-				console.log("Number of matches between us and the currently playing match:", playingNum);
-				console.log("Time between us and the currently queueing match:", queueingTime.formatted);
-				console.log("Color multiplier (0 <= x <= 1):", colorMultiplier);
-				console.log("Time considered '100%%':", color_change_time/60, 'minutes');
-				console.log('color: "'+color+'"');
-			}
-		}
-		updateTime();
-		setInterval(updateTime, 1000)
-	</script>
+	<script src="script.js" type="text/javascript"></script>
 </body>

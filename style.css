@@ -1,9 +1,18 @@
+/* @group General */
+
+html {
+	height: 100%;
+}
+
 body {
 	background-color: hsl(0, 0%, 50%);
 	font-family: 'Courier New', Courier, monospace;
-	margin: 7em auto 0;
+	padding: 3em 0 0;
+	margin: 0;
 	text-align: center;
 	text-shadow: rgba(255,255,255,.5) 0 .1em .2em;
+	height: 100%;
+	-webkit-box-sizing: border-box;
 }
 
 input, textarea {
@@ -19,15 +28,23 @@ input, textarea {
 	-webkit-columns: 2;
 }
 
+.hidden {
+	display: none;
+}
+
+/* @end */
+
+/* @group Config */
+
 #config {
 	background-color: rgb(40, 40, 40);
 	color: #eee;
 	position: absolute;
-	top: -9em;
+	top: -23em;
 	-webkit-transition: top 400ms ease-in-out;
 	right: 0;
 	left: 0;
-	padding: 2em 12em 1em;
+	padding: 2em 10em 1em;
 	z-index: 100;
 	text-shadow: 0 .1em .1em black;
 	-moz-box-shadow: 0 0 0.5em black;
@@ -57,36 +74,155 @@ input[type="time"] {
 	font-size: 1.5em;
 }
 
+/* @end */
+
+/* @group Known */
+
 #known {
 	background-color: #e5e5e5;
 	border-radius: .5em;
-	-moz-box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.6), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
-	-webkit-box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.6), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
-	box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.6), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
-	border-style: solid;
-	border-width: 1px;
+	-moz-box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.24), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
+	-webkit-box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.24), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
+	box-shadow: 0 .1em .1em rgba(255, 255, 255, 0.24), inset 0 .1em .3em rgba(0, 0, 0, 0.48);
 	padding: 1em 2em;
+	margin: 0 0 2em;
 	display: inline-block;
- }
+	border: 1px solid #000;
+	color: #222;
+	text-shadow: 0 .1em .1em rgba(255, 255, 255, 0.45);
+}
  
  #known_time {
 	width: 5em;
 }
- 
- #queue {
-	padding-top: 1em;
- }
- 
-span.replace {
+
+/* @end */
+
+/* @group Timers */
+
+#timers {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-box-pack: justify;
+	padding: 5%;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+}
+
+#timer_list, #timer_extras {
+/*	-webkit-box-flex: 1;*/
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+}
+
+#timer_list div, #timer_extras div {
+	-webkit-box-flex: 2;
+/*	max-width: 12em;*/
+}
+#timer_list div.spacer, #timer_extras div.spacer {
+	-webkit-box-flex: 1;
+}
+
+#timer_main {
+/*	-webkit-box-flex: 1;*/
+}
+
+/* @group Timer List & Extras */
+
+#timer_list a {
+	color: inherit;
+	text-decoration: inherit;
+	display: inline-block;
+	padding: 1em 2em;
+	opacity: .6;
+	border-radius: .5em;
+	border: 1px solid transparent;
+	-webkit-transition: opacity 200ms ease-in-out;
+}
+
+#timer_list :target a, #timers #timer_list div a:hover {
+	opacity: 1;
+	background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.06) 100%) rgba(255,255,255,.6);
+	border: 1px solid rgba(0,0,0,.8);
+	box-shadow:  0 .1em .1em rgba(255, 255, 255, 0.4), inset 0 .1em .3em rgba(0, 0, 0, 0.3);
+	
+}
+
+#timer_list .selected a {
+/*	opacity: 1;*/
+	background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.06) 100%) rgba(255,255,255,.6);
+	border: 1px solid rgba(0,0,0,.8);
+	box-shadow:  0 .1em .1em rgba(255, 255, 255, 0.4), inset 0 .1em .3em rgba(0, 0, 0, 0.3);
+}
+
+#timer_list:hover :target a {
+	opacity: .8;
+}
+
+#timer_list a:active {
+	background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.26) 100%) rgba(255,255,255,.6);
+}
+
+
+#timer_list h1, #timer_extras h1 {
+	margin: 0;
+	font-size: 1.5em;
+	font-weight: normal;
+	font-style: normal;
+}
+
+#timer_list .timer, #timer_extras .replace {
+	margin: .4em 0 .2em;
+	font-size: 2.7em;
+	font-weight: bold;
+}
+
+#timer_extras .replace {
+	margin: .1em 0;
+	font-size: 6em;
+}
+
+#auto h1 {
+	font-size: 1.8em;
+	font-weight: bold;
+	line-height: 1.5;
+	padding: .35em;
+}
+
+p.replace {
 	font-size: 1.2em;
 	font-style: italic;
-	background: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0.37) 0%, rgba(255, 255, 255, 0.27) 48.9%, rgba(255, 254, 255, 0.15) 49.4%, rgba(255, 255, 255, 0.06) 100%) rgba(255,255,255,.6);
+	display: inline-block;
+	background: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0.37) 0%, rgba(255, 255, 255, 0.27) 48.9%, rgba(255, 254, 255, 0.15) 49.4%, rgba(255, 255, 255, 0) 100%) rgba(255,255,255,.6);
 	padding: .2em .3em .15em .2em;
 	border-radius: .15em;
 	border: 1px solid rgba(0,0,0,.8);
-	box-shadow: inset 0 .1em .1em rgba(255, 255, 255, 0.4), 0 .1em .3em rgba(0, 0, 0, 0.3);
-	background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0.37)), color-stop(0.489, rgba(255, 255, 255, 0.27)), color-stop(0.494, rgba(255, 254, 255, 0.15)), to(rgba(255, 255, 255, 0.06))) rgba(255,255,255,.6);
+	box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.4), 0 .1em .3em rgba(0, 0, 0, 0.3);
+	background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0.37)), color-stop(0.489, rgba(255, 255, 255, 0.27)), color-stop(0.494, rgba(255, 254, 255, 0.15)), to(rgba(255, 255, 255, 0))) rgba(255,255,255,.6);
 }
+
+
+/* @end */
+
+#timer_main .name {
+	font-size: 3em;
+	padding-top: .5em;
+}
+
+#timer_main .timer {
+	margin: 0;
+	font-size: 17em;
+	font-weight: bold;
+}
+
+/* @end */
+
+/* @group Queue (old) */
+
+#queue {
+	padding-top: 1em;
+ }
+ 
  
  p.replace {
 	margin: 0;
@@ -117,3 +253,5 @@ span.replace {
 	font-size: 4.5em;
 	display: block;
  }
+
+/* @end */

@@ -1,4 +1,4 @@
-var debug = true;
+var debug = false;
 
 /********** Insert debug values **********/
 if (debug) {

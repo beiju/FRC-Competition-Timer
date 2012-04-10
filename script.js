@@ -4,6 +4,29 @@ var debug = false;
 if (debug) {
 	matchnums.value = '5, 13, 22, 36, 41, 49, 55, 67, 78';
 	known_time.value = '13:35';
+	
+	
+	if (window.applicationCache.status != window.applicationCache.UNCACHED) {
+		window.applicationCache.update();
+		
+		// Check if a new cache is available on page load.
+		window.addEventListener('load', function(e) {
+		
+		  window.applicationCache.addEventListener('updateready', function(e) {
+		    if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+		      // Browser downloaded a new app cache.
+		      // Swap it in and reload the page to get the new hotness.
+		      window.applicationCache.swapCache();
+		      if (confirm('A new version of this site is available. Load it?')) {
+		        window.location.reload();
+		      }
+		    } else {
+		      // Manifest didn't changed. Nothing new to serve.
+		    }
+		  }, false);
+		
+		}, false);
+	}
 }
 
 /********** Handle adaptive sizing **********/

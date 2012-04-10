@@ -18,11 +18,11 @@ A pretty modern web browser. The page depends heavily on CSS3 and some relativel
 
 TODO:
 -----
-* Use Lea Verou's prefixfree to easily 
 * Make 'now' button trigger input change
 * Fix application cache
 * Refactor
     - Consolidate into one timer with conditionals to run each function
+    - Drastically reduce garbage (http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript)
 * Ignore judging if it's too far in the past
 * Allow for configuration of how far negative the main timer is allowed to get
 * Use opening/closing ceremonies and lunch times to give more accurate estimates

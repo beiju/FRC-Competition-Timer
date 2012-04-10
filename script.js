@@ -82,7 +82,8 @@ now.addEventListener('click', function(event) {
 		minute = now.getMinutes();
 		
 	known_time.value = (hour<10?'0':'')+hour + ':' + (minute<10?'0':'')+minute;
-	
+	knownTime.hours = hour;
+	knownTime.minutes = minute;
 }, false)
 
 /********** Listen for Judges' award **********/

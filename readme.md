@@ -18,7 +18,6 @@ A pretty modern web browser. The page depends heavily on CSS3 and some relativel
 
 TODO:
 -----
-* Make 'now' button trigger input change
 * Fix application cache
 * Refactor
     - Consolidate into one timer with conditionals to run each function

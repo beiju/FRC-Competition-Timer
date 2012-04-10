@@ -7,12 +7,15 @@ The FRC Competition Timer is a Javascript timer to keep track of when your team 
 
 This timer was built by [Will Pryor][will] (with help from [Ian Naval][ian]) from [Team 3120: The RoboKnights][roboknights] during the 2012 Las Vegas FRC Regional. We hope you find it useful. If you have problems or contributions, feel free to use GitHub Issues and/or issue a pull request. 
 
+Requirements: A pretty modern web browser. The page depends heavily on CSS3 and some relatively recent JavaScript features. Offline mode will require application cache support. Since this timer is still in development, it hasn't been tested for compatability.
+
 [will]: http://beiju.us/
 [ian]: http://http://ianonavy.tumblr.com/
 [roboknights]: http://ndroboknights.com/
 
 TODO:
 -----
+* Use Lea Verou's prefixfree to easily 
 * Make 'now' button trigger input change
 * Fix application cache
 * Refactor

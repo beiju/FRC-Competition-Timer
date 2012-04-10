@@ -194,7 +194,7 @@ function resizeTimer() {
 		mainTimerLength = timerElem.innerHTML.length;
 		
 	if (typeof oldMainTimerLength == "undefined" || mainTimerLength != oldMainTimerLength) {
-		var size = timer_main.offsetWidth / mainTimerLength /9;
+		var size = timer_main.offsetWidth / mainTimerLength / 12;
 		
 		timerElem.style.fontSize = size+'em';
 	}

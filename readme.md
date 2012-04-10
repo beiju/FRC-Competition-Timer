@@ -1,7 +1,7 @@
 FRC Competition Timer
 =====================
 
-![Preview](preview.png)
+![Preview](http://beiju.github.com/FRC-Competition-Timer/preview.png)
 
 The FRC Competition Timer is a Javascript timer to keep track of when your team is up for queueing, playing, and judging during the Qualification matches of an FRC event. As of now it is minimally configurable, but in future it may allow users to set things like the number of matches between queueing and playing, or even detect that automatically from the @frcfms Twitter stream. It will also soon support offline use, since internet access is not available at the competition. When this feature is available, browsers that support the API will be able to visit use the page without internet access as long as they have already visited once with internet access.
 
@@ -14,7 +14,6 @@ This timer was built by [Will Pryor][will] (with help from [Ian Naval][ian]) fro
 TODO:
 -----
 * Make 'now' button trigger input change
-* 
 * Fix application cache
 * Refactor
     - Consolidate into one timer with conditionals to run each function

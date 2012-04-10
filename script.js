@@ -8,13 +8,15 @@ if (debug) {
 
 /********** Handle adaptive sizing **********/
 function resize() {
-	document.body.style.fontSize = (window.innerWidth * 16 / 1440)+'px';
+	window.pxPerEm = (window.innerWidth * 16 / 1440)
+	document.body.style.fontSize = pxPerEm+'px';
 }
 resize();
 window.onresize = function(e) { // I know I should use addEventListener(), but it wasn't working
 	if (typeof resizing != "boolean" || !resizing) {
 		window.resizing = true;
 		resize();
+		resizeTimer();
 		console.warn("Resizing window");
 		window.resizing = false;
 	}
@@ -183,24 +185,30 @@ function displayTime(time, id) {
 	
 	if (timer_main.className.match(id)) {
 		displayTime(time, 'timer_main');
-		
-		mainTimerLength = time.formatted.length;
-		if (typeof oldMainTimerLength == "undefined" || mainTimerLength != oldMainTimerLength) {
-			var size = timer_main.innerWidth / mainTimerLength;
-			
-			timer_main.style.fontSize = size+'em';
-		}
-		window.oldMainTimerLength = mainTimerLength;
+		resizeTimer();
 	}
 }
 
+function resizeTimer() {
+	var timerElem = timer_main.getElementsByClassName('timer')[0],
+		mainTimerLength = timerElem.innerHTML.length;
+		
+	if (typeof oldMainTimerLength == "undefined" || mainTimerLength != oldMainTimerLength) {
+		var size = timer_main.offsetWidth / mainTimerLength /9;
+		
+		timerElem.style.fontSize = size+'em';
+	}
+	window.oldMainTimerLength = mainTimerLength;
+	
+}
 
 /********** Handle updating time **********/
 function updateTime() {
 	var now = new Date();
 		
 	if (matches == null) {
-		timer_main.getElementsByClassName('timer')[0].innerHTML = 'Configure';
+		timer_main.getElementsByClassName('timer')[0].innerHTML = 'Not Configured';
+		resizeTimer();
 		document.body.style.backgroundColor = '';
 		return;
 	}

@@ -33,7 +33,7 @@ function iNaN(val) {
 
 if (debug) {
 	matchnums.value = '5, 13, 22, 36, 41, 49, 55, 67, 78';
-	known_time.value = '13:35';
+	known_time.value = '23:00';
 	
 	//! NOTE: not functioning
 	if (window.applicationCache.status != window.applicationCache.UNCACHED) {
@@ -143,17 +143,17 @@ function Timer(time) {
 		},
 		hours: function() {
 			if (this.time == undefined) throw tnd_error;
-			if (this.c.hours == undefined) this.c.hours = Math.abs( ~~(this.time / 60) );
+			if (this.c.hours == undefined) this.c.hours = Math.abs( ~~(this.time / 60) )%24;
 			return this.c.hours;
 		},
 		minutes: function() {
 			if (this.time == undefined) throw tnd_error;
-			if (this.c.minutes == undefined) this.c.minutes = Math.abs( ~~this.time);
+			if (this.c.minutes == undefined) this.c.minutes = Math.abs( ~~this.time)%60;
 			return this.c.minutes;
 		},
 		seconds: function() {
 			if (this.time == undefined) throw tnd_error;
-			if (this.c.seconds == undefined) this.c.seconds = Math.abs( ~~(this.time*60) );
+			if (this.c.seconds == undefined) this.c.seconds = Math.abs( ~~((this.time%1)*60) );
 			return this.c.seconds;
 		},
 		negative: function() {

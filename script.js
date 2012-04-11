@@ -22,7 +22,7 @@ var debug = true,
 	playing_inner = playing.getElementsByClassName('timer')[0],
 	judging_inner = judging.getElementsByClassName('timer')[0];
 	
-/** Tempoarry Variables (initialized here for performance) */
+/** Temporary Variables (initialized here for performance) */
 var now, offset, nowQueueingNum, nowPlayingNum, ourNextMatchNum, ourNextMatchTime, i, len, match, time, lowestTimer, target, selected, colorMultiplier, color;
 
 /** Utility Methods */
@@ -58,8 +58,6 @@ if (debug) {
 		}, false);
 	}
 }
-
-
 
 
 /** Get and update values of inputs */
@@ -116,39 +114,6 @@ now.addEventListener('click', function(event) {
 	referenceMatchTime.minutes = minute;
 }, false)
 
-		
-
-/** Class for handling times (deprecated) */
-function Time(minutes) {
-	var o = {
-		time: minutes,
-		days: 0,
-		hours: 0,
-		minutes: Math.abs( minutes > 0 ? Math.floor(minutes) : Math.ceil(minutes) ),
-		seconds: Math.abs( Math.round(minutes*60 % 60) ),
-		negative: minutes < 0 ? true : false,
-	}
-	// Handle hours and days
-	if (o.minutes >= 60) {
-		o.hours = Math.floor(o.minutes/60);
-		o.minutes -= o.hours * 60;
-	} 
-	if (o.hours >= 24) {
-		o.days = Math.floor(o.hours/24);
-		o.hours -= o.days * 24;
-	} 
-	// Handle 60 seconds
-	if (o.seconds == 60) {
-		o.seconds = 0;
-		o.minutes = 1;
-	}
-	o.formatted = (o.negative?'-':'');
-	if (o.days != 0) o.formatted += o.days+':';
-	if (o.hours != 0) o.formatted += (o.days>0&&o.hours<10?'0':'')+o.hours+':';
-	o.formatted += (o.hours>0&&o.minutes<10?'0':'')+o.minutes+':';
-	o.formatted += (o.seconds<10?'0':'')+o.seconds;
-	return o;
-}
 
 /** Class to store a timer. Time is stored in minutes. Heavily optimized, but optimized for the wrong uses.
  * It should work well for different uses, but will probably have to be rewritten again for this use.
@@ -368,112 +333,6 @@ function updateAutoSelectedTimer() {
 	mainTimer = timers[lowestTimer];
 }
 
-/*
-function autoSelectedTimer() {
-	var elements = timer_list.getElementsByClassName('timer'),
-		lowest, lowest_i = 0;
-	
-	for (var i=0, len = elements.length; i<len; i++) {
-		if (!elements[i].getAttribute('data-time')) continue;
-		var time = parseFloat(elements[i].getAttribute('data-time'));
-		if (typeof lowest != "number" || (time < lowest && time != 0)) {
-			lowest = time;
-			lowest_i = i;
-		}
-	}
-	
-	var lowestID = elements[lowest_i].parentNode.parentNode.getAttribute('id');
-	
-	if (typeof oldLowestID != "string" || lowestID != oldLowestID) {
-		timer_main.className = lowestID;
-		var selected = timer_list.getElementsByClassName('selected')
-		for (var i = 0, len = selected.length; i < len; i++) {
-			selected[i].innerHTML = selected[i].innerHTML.replace(/ ?selected/i, '');
-		}
-		document.getElementById(lowestID).className += ' selected';
-		
-		window.oldLowestID = lowestID;
-	}
-}
-
-/** Listen for Judges' award ** /
-function judgingTime() {
-	if (judging_time.value == '' || !judging_time.value.match(/[1-9]/) || judge_today.value == "false" ) {
-		if (!judging.className.match(/hidden/)) {
-			judging.className += ' hidden';
-			judging.getElementsByClassName('timer')[0].removeAttribute('data-time');
-		}
-		return;
-	} else {
-		if (judging.className.match(/hidden/)) judging.className.replace(' hidden', '');
-	}
-	
-	var time  = {
-		hours: parseInt(judging_time.value.match(/^\d+/)[0], 10),
-		minutes: parseInt(judging_time.value.match(/\d+$/)[0], 10)
-	}
-	
-}
-judgingTime();
-judging_time.addEventListener('change', judgingTime, false);
-judge_today.addEventListener('change', judgingTime, false);
-
-function updateTime() {
-	var now = new Date();
-		
-	if (matches == null) {
-		timer_main.getElementsByClassName('timer')[0].innerHTML = 'Not Configured';
-		resizeTimer();
-		document.body.style.backgroundColor = '';
-		return;
-	}
-	
-	var offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (referenceMatchTime.hours*60*60+referenceMatchTime.minutes*60),
-		currentlyQueueing = referenceMatchNum + offset / interval,
-		currentlyPlaying = currentlyQueueing - 3,
-		ourNextNum = 0;
-	
-	for (var len = matches.length, i = 0; i < len && ourNextNum == 0; i++) {
-		var match = parseInt(matches[i], 10);
-		if (match > currentlyPlaying) ourNextNum = match;
-	}
-	if (ourNextNum == 0) ourNextNum = match;
-	
-	
-	our_next.getElementsByClassName('replace')[0].innerHTML = ourNextNum;
-	now_queueing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyQueueing);
-	now_playing.getElementsByClassName('replace')[0].innerHTML = Math.floor(currentlyPlaying);
-	if (!isNaN(queueingTime.minutes)) displayTime(queueingTime, 'queueing');
-	if (!isNaN(playingTime.minutes))  displayTime(playingTime, 'playing');
-   	
-	
-	var colorMultiplier = parseFloat(timer_main.getElementsByClassName('timer')[0].getAttribute('data-time'))/color_change_time;
-	if (colorMultiplier > 1) colorMultiplier = 1;
-	else if (colorMultiplier < 0) colorMultiplier = 0;
-	
-	//var color = 'rgb('+Math.min(Math.round(255*(1-colorMultiplier)), 255)+','+Math.min(Math.round(255*colorMultiplier),255)+','+0+')';
-	var color = 'hsl('+Math.round(130*colorMultiplier)+',100%,50%)';
-	
-	if (typeof oldColor != "string" || oldColor != color) {
-		document.body.style.backgroundColor = color;
-		window.oldColor = color;
-	}
-	
-	if (debug && false) {
-		console.log("Now:", now);
-		console.log("Last Known time:", referenceMatchTime.hours, ':', referenceMatchTime.minutes);
-		console.log("Offset between now and last known time:", offset);
-		console.log("Currently queueing match:", currentlyQueueing, "Currently playing match:", currentlyPlaying);
-		console.log("Next match we play:", ourNextNum);
-		console.log("Number of m atches between us and the currently queueing match:", queueingNum);
-		console.log("Number of ma tches between us and the currently playing match:", playingNum);
-		console.log("Time between us and the currently queueing match:", queueingTime.formatted);
-		console.log("Color multiplier (0 <= x <= 1):", colorMultiplier);
-		console.log("Time considered '100%%':", color_change_time/60, 'minutes');
-		console.log('color: "'+color+'"');
-	}
-}
-updateTime();*/
 
 /** Master Interval */
 function masterInterval() {
@@ -483,4 +342,4 @@ function masterInterval() {
 	displayTimers();
 	displayColors();
 }
-window.setInterval(masterInterval, 1000)
+window.setInterval(masterInterval, 1000);

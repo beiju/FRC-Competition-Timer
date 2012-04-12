@@ -207,12 +207,16 @@ function switchTimers(event) {
 	
 	timer_main.className = target;
 	
-	if (target != "auto" && typeof autoSelectedTimerInterval != "undefined") {
+	if (target === "auto") {
+		timerSelectCleared = false;
+	} else if (target != "auto" && (typeof timerSelectCleared === "undefined" || !timerSelectCleared)) {
 		selected = timer_list.getElementsByClassName('selected')
 		for (i = 0, len = selected.length; i < len; i++) {
 			selected[i].classList.remove('selected');
 		}
 		mainTimer = window[target+'Timer'];
+		timerSelectCleared = true;
+		lastSelectedTimer = '';
 	}
 	
 	if (document.getElementById(target).className.match(/hidden/)) { // If the picked timer is hidden, for some reason
@@ -354,7 +358,7 @@ function masterInterval() {
 	now = new Date()
 	updateMatchTime();
 	updateJudgingTime();
-	updateAutoSelectedTimer();
+	if (target === "auto") updateAutoSelectedTimer();
 	displayTimers();
 	displayColors();
 }

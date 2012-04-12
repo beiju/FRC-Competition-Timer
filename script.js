@@ -108,8 +108,7 @@ judging_time.addEventListener('change', function(event) {
 
 /** Code for "Now" button */
 now.addEventListener('click', function(event) { 
-	var now = new Date(), 
-		hour = now.getHours(),
+	var hour = now.getHours(),
 		minute = now.getMinutes();
 		
 	known_time.value = (hour<10?'0':'')+hour + ':' + (minute<10?'0':'')+minute;
@@ -141,7 +140,7 @@ function Timer(time) {
 		
 		days: function() {
 			if (this.time == undefined) throw tnd_error;
-			if (this.c.days == undefined)  this.c.days = Math.abs( ~~(this.time / 60 / 24) );
+			if (this.c.days == undefined) this.c.days = Math.abs( ~~(this.time / 60 / 24) );
 			return this.c.days;
 		},
 		hours: function() {
@@ -156,7 +155,7 @@ function Timer(time) {
 		},
 		seconds: function() {
 			if (this.time == undefined) throw tnd_error;
-			if (this.c.seconds == undefined) this.c.seconds = Math.abs( ~~((this.time%1)*60) );
+			if (this.c.seconds == undefined) this.c.seconds = Math.abs( ~~((this.time%1)*60) ) + (this.negative()?1:0);
 			return this.c.seconds;
 		},
 		negative: function() {
@@ -247,12 +246,12 @@ function setJudgingEnabled(enabled) {
 
 
 /** Display timer values */
-function displayTimers() {
-	if (!isNaN(queueingTimer.time)) our_next_inner.innerHTML = Math.floor(ourNextMatchNum);
+function displayTimers() { 
+	if (!isNaN(queueingTimer.time)) our_next_inner.innerHTML = ourNextMatchNum|0;
 	if (!isNaN(queueingTimer.time)) queueing_inner.innerHTML = queueingTimer.formatted();
-	if (!isNaN(nowQueueingNum)) now_queueing_inner.innerHTML = Math.floor(nowQueueingNum);
+	if (!isNaN(nowQueueingNum)) now_queueing_inner.innerHTML = nowQueueingNum|0;
 	if (!isNaN(playingTimer.time)) playing_inner.innerHTML = playingTimer.formatted();
-	if (!isNaN(nowPlayingNum)) now_playing_inner.innerHTML = Math.floor(nowPlayingNum);
+	if (!isNaN(nowPlayingNum)) now_playing_inner.innerHTML = nowPlayingNum|0;
 	if (!isNaN(judgingTimer.time)) judging_inner.innerHTML = judgingTimer.formatted();
 	if (mainTimer != undefined && !isNaN(mainTimer.time)) timer_main_inner.innerHTML = mainTimer.formatted();
 	
@@ -296,12 +295,10 @@ function updateMatchTime() {
 	} else { 
 		setConfigured(true);
 	}
-	
-	now = new Date();
-	
+		
 	offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (referenceMatchTime.hours*60*60+referenceMatchTime.minutes*60);
 	nowQueueingNum = referenceMatchNum + offset / interval;
-	nowPlayingNum = nowQueueingNum + 3; //! TODO: Make this configurable
+	nowPlayingNum = nowQueueingNum - 3; //! TODO: Make this configurable
 	ourNextMatchNum = 0;
 	
 	for (len = matches.length, i = 0; i < len && ourNextMatchNum == 0; i++) {
@@ -324,7 +321,6 @@ function updateJudgingTime() {
 		setJudgingEnabled(true);
 	}
 	
-	now = new Date();
 	time = (judgeToday.hours - now.getHours()) * 60 + (judgeToday.minutes - now.getMinutes()) - now.getSeconds();
 	judgingTimer.changeTo(time);
 }
@@ -339,6 +335,7 @@ function updateAutoSelectedTimer() {
 
 /** Master Interval */
 function masterInterval() {
+	now = new Date()
 	updateMatchTime();
 	updateJudgingTime();
 	updateAutoSelectedTimer();

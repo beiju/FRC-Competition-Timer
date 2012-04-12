@@ -17,13 +17,16 @@ window.onresize = function(e) { // I know I should use addEventListener(), but i
 
 /** Important Variables */
 var debug = true,
+	our_next_inner = our_next.getElementsByClassName('replace')[0],
+	now_queueing_inner = now_queueing.getElementsByClassName('replace')[0],
+	now_playing_inner = now_playing.getElementsByClassName('replace')[0],
 	timer_main_inner = timer_main.getElementsByClassName('timer')[0],
 	queueing_inner = queueing.getElementsByClassName('timer')[0],
 	playing_inner = playing.getElementsByClassName('timer')[0],
 	judging_inner = judging.getElementsByClassName('timer')[0];
 	
 /** Temporary Variables (initialized here for performance) */
-var now, offset, nowQueueingNum, nowPlayingNum, ourNextMatchNum, ourNextMatchTime, i, len, match, time, lowestTimer, target, selected, colorMultiplier, color;
+var now, offset, ourNextMatchNum, nowPlayingNum, nowQueueingNum, ourNextMatchTime, i, len, match, time, lowestTimer, target, selected, colorMultiplier, color;
 
 /** Utility Methods */
 function iNaN(val) {
@@ -169,7 +172,7 @@ function Timer(time) {
 			if (this.negative()) this.c.formatted += this.neg_sign;
 			if (this.days() != 0) this.c.formatted += this.days()+this.separator;
 			if (this.hours() != 0) this.c.formatted += this.hours()+this.separator;
-			if (this.minutes() < 10) this.c.formatted += this.zero;
+			if (this.hours() != 0 && this.minutes() < 10) this.c.formatted += this.zero;
 			this.c.formatted += this.minutes()+this.separator;
 			if (this.seconds() < 10) this.c.formatted += this.zero;
 			this.c.formatted += this.seconds();
@@ -245,8 +248,11 @@ function setJudgingEnabled(enabled) {
 
 /** Display timer values */
 function displayTimers() {
+	if (!isNaN(queueingTimer.time)) our_next_inner.innerHTML = Math.floor(ourNextMatchNum);
 	if (!isNaN(queueingTimer.time)) queueing_inner.innerHTML = queueingTimer.formatted();
+	if (!isNaN(nowQueueingNum)) now_queueing_inner.innerHTML = Math.floor(nowQueueingNum);
 	if (!isNaN(playingTimer.time)) playing_inner.innerHTML = playingTimer.formatted();
+	if (!isNaN(nowPlayingNum)) now_playing_inner.innerHTML = Math.floor(nowPlayingNum);
 	if (!isNaN(judgingTimer.time)) judging_inner.innerHTML = judgingTimer.formatted();
 	if (mainTimer != undefined && !isNaN(mainTimer.time)) timer_main_inner.innerHTML = mainTimer.formatted();
 	
@@ -282,7 +288,6 @@ function resizeTimer() {
 }
 
 /** Handle updating time */
-
 function updateMatchTime() {
 	// Detect if required data has been supplied
 	if (matches == null || iNaN(interval) || iNaN(referenceMatchNum) || iNaN(referenceMatchTime.hours) || iNaN(referenceMatchTime.minutes)) {
@@ -296,20 +301,18 @@ function updateMatchTime() {
 	
 	offset = (now.getHours()*60*60+now.getMinutes()*60+now.getSeconds()) - (referenceMatchTime.hours*60*60+referenceMatchTime.minutes*60);
 	nowQueueingNum = referenceMatchNum + offset / interval;
-	nowPlayingNum = nowQueueingNum - 3; //! TODO: Make this configurable
+	nowPlayingNum = nowQueueingNum + 3; //! TODO: Make this configurable
 	ourNextMatchNum = 0;
 	
 	for (len = matches.length, i = 0; i < len && ourNextMatchNum == 0; i++) {
 		match = parseInt(matches[i], 10);
 		if (match > nowPlayingNum) ourNextMatchNum = match;
 	}
-	//! TODO: Add detection of erroneous match numbers here: competition is over, it's between days, it's lunchtime, etc.
+	//! TODO: Add detection of special case match numbers here: competition is over, it's between days, it's lunchtime, etc.
 	if (ourNextMatchNum == 0) ourNextMatchNum = match; // Band-aid
 	
-	nowQueueingNum = ourNextMatchNum - nowQueueingNum;
-	playingNum = ourNextMatchNum - nowPlayingNum;
-	queueingTimer.changeTo(nowQueueingNum*interval/60); 
-	playingTimer.changeTo(nowPlayingNum*interval/60); 
+	queueingTimer.changeTo((ourNextMatchNum - nowQueueingNum)*interval/60); 
+	playingTimer.changeTo(ourNextMatchNum - nowPlayingNum*interval/60); 
 
 }
 function updateJudgingTime() {

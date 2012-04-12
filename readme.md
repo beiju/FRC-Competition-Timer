@@ -19,6 +19,7 @@ A pretty modern web browser. The page depends heavily on CSS3 and some relativel
 TODO:
 -----
 * Fix application cache
+* Mobile styles
 * Refactor
     - Consolidate into one timer with conditionals to run each function
     - Drastically reduce garbage (http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript)

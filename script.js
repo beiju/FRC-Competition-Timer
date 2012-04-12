@@ -254,8 +254,6 @@ function displayTimers() {
 	if (!isNaN(nowPlayingNum)) now_playing_inner.innerHTML = nowPlayingNum|0;
 	if (!isNaN(judgingTimer.time)) judging_inner.innerHTML = judgingTimer.formatted();
 	if (mainTimer != undefined && !isNaN(mainTimer.time)) timer_main_inner.innerHTML = mainTimer.formatted();
-	
-	
 }
 
 /** Display color */
@@ -309,7 +307,7 @@ function updateMatchTime() {
 	if (ourNextMatchNum == 0) ourNextMatchNum = match; // Band-aid
 	
 	queueingTimer.changeTo((ourNextMatchNum - nowQueueingNum)*interval/60); 
-	playingTimer.changeTo(ourNextMatchNum - nowPlayingNum*interval/60); 
+	playingTimer.changeTo((ourNextMatchNum - nowPlayingNum)*interval/60); 
 
 }
 function updateJudgingTime() {

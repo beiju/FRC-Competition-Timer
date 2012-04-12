@@ -120,9 +120,10 @@ now.addEventListener('click', function(event) {
 /** Class to store a timer. Time is stored in minutes. Heavily optimized, but optimized for the wrong uses.
  * It should work well for different uses, but will probably have to be rewritten again for this use.
  */
-function Timer(time) {
+function Timer(name) {
 	return {
-		time: time,
+		name: name,
+		time: undefined,
 		c: { // shortened version of 'cache'
 			days: undefined,
 			hours: undefined,
@@ -192,7 +193,7 @@ function Timer(time) {
 		
 	}
 }
-var queueingTimer = new Timer(), playingTimer = new Timer(), judgingTimer = new Timer(), timers = [queueingTimer, playingTimer, judgingTimer], mainTimer;
+var queueingTimer = new Timer('queueing'), playingTimer = new Timer('playing'), judgingTimer = new Timer('judging'), timers = [queueingTimer, playingTimer, judgingTimer], mainTimer;
 
 
 /** Hash change listener */
@@ -299,6 +300,7 @@ function updateMatchTime() {
 	nowPlayingNum = nowQueueingNum - 3; //! TODO: Make this configurable
 	ourNextMatchNum = 0;
 	
+	//! TODO: Check if this loop needs to be run by checking if one of the timers moved by > 1 second
 	for (len = matches.length, i = 0; i < len && ourNextMatchNum == 0; i++) {
 		match = parseInt(matches[i], 10);
 		if (match > nowPlayingNum) ourNextMatchNum = match;
@@ -327,7 +329,23 @@ function updateAutoSelectedTimer() {
 	for (i = 0, len = timers.length; i < len; i++) {
 		if (timers[i].time < timers[lowestTimer].time) lowestTimer = i;
 	}
+	
 	mainTimer = timers[lowestTimer];
+	
+	if (typeof lastSelectedTimer == "undefined" || lastSelectedTimer !== mainTimer.name) {
+		selectedTimers = document.getElementsByClassName('selected');
+		
+		if (selectedTimers.length !== 0) {
+			// I probably don't need to loop, so I'll use a shorter special case
+			if (selectedTimers.length === 1) selectedTimers[i].classList.remove('selected');
+			for (i = 0, len = selectedTimers.len; i < len; i++) {
+				selectedTimers[i].classList.remove('selected');
+			}
+		}
+		
+		document.getElementById(mainTimer.name).classList.add('selected');
+		window.lastSelectedTimer = mainTimer.name;
+	}
 }
 
 

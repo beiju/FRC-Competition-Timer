@@ -20,6 +20,7 @@ TODO:
 -----
 * Fix application cache
 * Mobile styles
+* Make constants for ALL the strings!
 * Refactor
     - Consolidate into one timer with conditionals to run each function
     - Drastically reduce garbage (http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript)

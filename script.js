@@ -36,7 +36,9 @@ function iNaN(val) {
 
 if (debug) {
 	matchnums.value = '5, 13, 22, 36, 41, 49, 55, 67, 78';
-	known_time.value = '23:00';
+	known_time.value = '00:00';
+	judging_time.value = '02:00';
+	judging_today.checked = true;
 	
 	//! NOTE: not functioning
 	if (window.applicationCache.status != window.applicationCache.UNCACHED) {
@@ -67,6 +69,7 @@ if (debug) {
 var interval = parseFloat(match_interval.value, 10)*60,
 	color_change_time = parseFloat(change_color.value, 10),
 	matches = matchnums.value.match(/\d+/g),
+	judgingToday = judging_today.checked,
 	referenceMatchNum = parseInt(known_num.value, 10), // Without the 10, it assumes numbers prepended with 0 are octal
 	referenceMatchTime = {
 		hours: parseInt(known_time.value.match(/^\d+/)[0], 10),
@@ -103,6 +106,9 @@ known_time.addEventListener('change', function(event) {
 judging_time.addEventListener('change', function(event) {
 	judgingTime.hours = parseInt(judging_time.value.match(/^\d+/)[0], 10);
 	judgingTime.minutes = parseInt(judging_time.value.match(/\d+$/)[0], 10);
+}, false);
+judging_today.addEventListener('change', function(event) {
+	judgingToday = judging_today.checked;
 }, false)
 
 
@@ -318,14 +324,14 @@ function updateMatchTime() {
 }
 function updateJudgingTime() {
 	// Detect if required data has been supplied
-	if (iNaN(judgingTime) || !judgeToday || judgingTime.minutes == 0) {
+	if (iNaN(judgingTime.minutes) || !judgingToday || (judgingTime.minutes === 0 && judgingTime.hours === 0)) {
 		setJudgingEnabled(false);
 		return;
 	} else {
 		setJudgingEnabled(true);
 	}
 	
-	time = (judgeToday.hours - now.getHours()) * 60 + (judgeToday.minutes - now.getMinutes()) - now.getSeconds();
+	time = (judgingTime.hours - now.getHours()) * 60 + (judgingTime.minutes - now.getMinutes()) - now.getSeconds()/60;
 	judgingTimer.changeTo(time);
 }
 function updateAutoSelectedTimer() {

@@ -16,7 +16,7 @@ window.onresize = function(e) { // I know I should use addEventListener(), but i
 
 
 /** Important Variables */
-var debug = true,
+var debug = false,
 	our_next_inner = our_next.getElementsByClassName('replace')[0],
 	now_queueing_inner = now_queueing.getElementsByClassName('replace')[0],
 	now_playing_inner = now_playing.getElementsByClassName('replace')[0],
@@ -38,7 +38,7 @@ if (debug) {
 	matchnums.value = '5, 13, 22, 36, 41, 49, 55, 67, 78';
 	known_time.value = '00:00';
 	judging_time.value = '02:00';
-	judging_today.checked = true;
+	judging_today.checked = false;
 	
 	//! NOTE: not functioning
 	if (window.applicationCache.status != window.applicationCache.UNCACHED) {
@@ -361,11 +361,13 @@ function updateAutoSelectedTimer() {
 
 /** Master Interval */
 function masterInterval() {
-	now = new Date()
+	now = new Date();
 	updateMatchTime();
 	updateJudgingTime();
 	if (target === "auto") updateAutoSelectedTimer();
 	displayTimers();
 	displayColors();
+	console.log("Looped in", Date.now() - now.getTime(), 'ms');
+	console.log("Started at", now.getSeconds()+now.getMilliseconds()/1000);
 }
 window.setInterval(masterInterval, 1000);
